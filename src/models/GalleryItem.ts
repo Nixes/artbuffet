@@ -1,10 +1,7 @@
-export default class GalleryItem {
+type GalleryItem = {
     // link to artist page
-    private itemURL: string;
-    private thumbnailImageURL: string;
-
-    constructor(itemURL: string, thumbnailImageURL: string) {
-        this.itemURL = itemURL;
-        this.thumbnailImageURL = thumbnailImageURL;
-    }
+    itemURL: string,
+    // url to thumbnail image
+    thumbnailImageURL: string
 }
+export default GalleryItem;

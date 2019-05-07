@@ -12,7 +12,7 @@ export default class ArtStationAPI {
         const json = await response.json();
         const artstationItems: [] = json.data;
         const convertedItems: GalleryItem[] = artstationItems.map((artstationItem:any)=>{
-            return new GalleryItem(artstationItem.permalink,artstationItem.cover.micro_square_image_url);
+            return {itemURL:artstationItem.permalink,thumbnailImageURL:artstationItem.cover.micro_square_image_url};
         });
         return convertedItems;
     }

@@ -5,147 +5,134 @@ import {
     CellMeasurerCache,
     createMasonryCellPositioner,
     Masonry,
-    AutoSizer
+    AutoSizer,
+    WindowScroller,
+    Positioner
 } from 'react-virtualized';
+import GalleryItem from "../models/GalleryItem";
 
-type DatumImage = {
-    source: string,
-    caption: string,
-    imageHeight: number,
-    imageWidth: number,
-}
+const GUTTER = 1;
+const COLUMN_WIDTH = 200;
+const IMAGE_HEIGHT = 200;
+const IMAGE_WIDTH = 200;
 
 // Array of images with captions
-const list: DatumImage[] = [
-    {source: "https://cdnb.artstation.com/p/assets/covers/images/017/685/915/micro_square/timo-peter-artstation-title-image.jpg?1556957002", caption: "nothing", imageHeight:200,imageWidth:200},
-    {source: "https://cdnb.artstation.com/p/assets/covers/images/017/685/915/micro_square/timo-peter-artstation-title-image.jpg?1556957002", caption: "nothing", imageHeight:200,imageWidth:200},
-    {source: "https://cdnb.artstation.com/p/assets/covers/images/017/685/915/micro_square/timo-peter-artstation-title-image.jpg?1556957002", caption: "nothing", imageHeight:200,imageWidth:200},
-    {source: "https://cdnb.artstation.com/p/assets/covers/images/017/685/915/micro_square/timo-peter-artstation-title-image.jpg?1556957002", caption: "nothing", imageHeight:200,imageWidth:200},
-    {source: "https://cdnb.artstation.com/p/assets/covers/images/017/685/915/micro_square/timo-peter-artstation-title-image.jpg?1556957002", caption: "nothing", imageHeight:200,imageWidth:200},
-    {source: "https://cdnb.artstation.com/p/assets/covers/images/017/685/915/micro_square/timo-peter-artstation-title-image.jpg?1556957002", caption: "nothing", imageHeight:200,imageWidth:200},
-    {source: "https://cdnb.artstation.com/p/assets/covers/images/017/685/915/micro_square/timo-peter-artstation-title-image.jpg?1556957002", caption: "nothing", imageHeight:200,imageWidth:200},
-    {source: "https://cdnb.artstation.com/p/assets/covers/images/017/685/915/micro_square/timo-peter-artstation-title-image.jpg?1556957002", caption: "nothing", imageHeight:200,imageWidth:200},
-];
+// const list: DatumImage[] = [
+//     {source: "https://cdnb.artstation.com/p/assets/covers/images/017/685/915/micro_square/timo-peter-artstation-title-image.jpg?1556957002", caption: "nothing", imageHeight:200,imageWidth:200},
+//     {source: "https://cdnb.artstation.com/p/assets/covers/images/017/685/915/micro_square/timo-peter-artstation-title-image.jpg?1556957002", caption: "nothing", imageHeight:200,imageWidth:200},
+//     {source: "https://cdnb.artstation.com/p/assets/covers/images/017/685/915/micro_square/timo-peter-artstation-title-image.jpg?1556957002", caption: "nothing", imageHeight:200,imageWidth:200},
+//     {source: "https://cdnb.artstation.com/p/assets/covers/images/017/685/915/micro_square/timo-peter-artstation-title-image.jpg?1556957002", caption: "nothing", imageHeight:200,imageWidth:200},
+//     {source: "https://cdnb.artstation.com/p/assets/covers/images/017/685/915/micro_square/timo-peter-artstation-title-image.jpg?1556957002", caption: "nothing", imageHeight:200,imageWidth:200},
+//     {source: "https://cdnb.artstation.com/p/assets/covers/images/017/685/915/micro_square/timo-peter-artstation-title-image.jpg?1556957002", caption: "nothing", imageHeight:200,imageWidth:200},
+//     {source: "https://cdnb.artstation.com/p/assets/covers/images/017/685/915/micro_square/timo-peter-artstation-title-image.jpg?1556957002", caption: "nothing", imageHeight:200,imageWidth:200},
+//     {source: "https://cdnb.artstation.com/p/assets/covers/images/017/685/915/micro_square/timo-peter-artstation-title-image.jpg?1556957002", caption: "nothing", imageHeight:200,imageWidth:200},
+// ];
 
-// Default sizes help Masonry decide how many images to batch-measure
-const cache = new CellMeasurerCache({
-    defaultHeight: 250,
-    defaultWidth: 200,
-    fixedWidth: true,
-})
+type GalleryState = {
+    items: GalleryItem[]
+}
 
-// Our masonry layout will use 3 columns with a 10px gutter between
-const cellPositioner = createMasonryCellPositioner({
-    cellMeasurerCache: cache,
-    columnCount: 3,
-    columnWidth: 200,
-    spacer: 10
-});
-
-
-export class Gallery extends React.Component<any> {
-    private _height: number;
-    private _width: number;
-    private _columnCount: number;
+export class Gallery extends React.Component<any,GalleryState> {
+    private height: number;
+    private width: number;
+    private columnCount: number;
+    private cellPositioner: Positioner;
+    private cache: CellMeasurerCache;
+    private masonry;
 
     constructor(props) {
         super(props);
+        this.state = {
+            items: [
+                {thumbnailImageURL: "https://cdnb.artstation.com/p/assets/covers/images/017/685/915/micro_square/timo-peter-artstation-title-image.jpg?1556957002", itemURL:"https://www.artstation.com"},
+                {thumbnailImageURL: "https://cdnb.artstation.com/p/assets/covers/images/017/685/915/micro_square/timo-peter-artstation-title-image.jpg?1556957002", itemURL:"https://www.artstation.com"},
+                {thumbnailImageURL: "https://cdnb.artstation.com/p/assets/covers/images/017/685/915/micro_square/timo-peter-artstation-title-image.jpg?1556957002", itemURL:"https://www.artstation.com"},
+                {thumbnailImageURL: "https://cdnb.artstation.com/p/assets/covers/images/017/685/915/micro_square/timo-peter-artstation-title-image.jpg?1556957002", itemURL:"https://www.artstation.com"},
+            ]
+        };
 
-        this._height = 600;
-        this._width = 800;
-        this._columnCount = 4;
+        this.height = 600;
+        this.width = 800;
+        this.columnCount = 4;
+
+        // Default sizes help Masonry decide how many images to batch-measure
+        this.cache = new CellMeasurerCache({
+            defaultHeight: 250,
+            defaultWidth: 200,
+            fixedWidth: true,
+        });
+
+        // Our masonry layout will use 3 columns with a 10px gutter between
+        this.cellPositioner = createMasonryCellPositioner({
+            cellMeasurerCache: this.cache,
+            columnCount: 3,
+            columnWidth: 200,
+            spacer: 10
+        });
     }
 
-    private cellRenderer ({ index, key, parent, style }) {
-        const datum:DatumImage = list[index]
+
+    onResize = ({width}: any) => {
+        this.cache.clearAll();
+        this.calculateColumnCount(width);
+        this.resetCellPositioner();
+        this.masonry.recomputeCellPositions();
+    }
+
+    cellRenderer = (cellProps: any) => {
+        const items = this.state.items;
+        const item = items[cellProps.index];
 
         return (
             <CellMeasurer
-                cache={cache}
-                index={index}
-                key={key}
-                parent={parent}
+                cache={this.cache}
+                index={cellProps.index}
+                key={cellProps.key}
+                parent={cellProps.parent}
             >
-                <div style={style}>
-                    <img
-                        src={datum.source}
-                        style={{
-                            height: datum.imageHeight,
-                            width: datum.imageWidth
-                        }}
-                    />
+                <div style={cellProps.style}>
+                    <img src={item.thumbnailImageURL}/>
                 </div>
             </CellMeasurer>
-        )
-    }
-
-    _calculateColumnCount() {
-        const {columnWidth, gutterSize} = this.state;
-
-        this._columnCount = Math.floor(this._width / (columnWidth + gutterSize));
-    }
-
-
-    private _onResize({width}) {
-        this._width = width;
-
-        this._calculateColumnCount();
-        this._resetCellPositioner();
-        this._masonry.recomputeCellPositions();
-    }
-
-    private _setMasonryRef(ref) {
-        this._masonry = ref;
-    }
-
-    _renderAutoSizer({height, scrollTop}) {
-        this._height = height;
-        this._scrollTop = scrollTop;
-
-        const {overscanByPixels} = this.state;
-
-        return (
-            <AutoSizer
-                disableHeight
-                height={height}
-                onResize={this._onResize}
-                overscanByPixels={overscanByPixels}
-                scrollTop={this._scrollTop}>
-                {this._renderMasonry}
-            </AutoSizer>
         );
     }
 
-    public _renderMasonry({width}) {
-        // Render your grid
-        return (
-            <Masonry
-                autoHeight={true}
-                cellCount={list.length}
-                cellMeasurerCache={cache}
-                cellPositioner={cellPositioner}
-                // @ts-ignore
-                cellRenderer={this.cellRenderer}
-                width={width}
-                height={this.height}
-                ref={this._setMasonryRef}
-            />
-        );
+    calculateColumnCount = (width: number) =>  {
+        this.columnCount = Math.floor((width + GUTTER) / (COLUMN_WIDTH + GUTTER));
     }
-    public render() {
+
+    resetCellPositioner = () => {
+        this.cellPositioner.reset({
+            columnCount: this.columnCount,
+            columnWidth: COLUMN_WIDTH,
+            spacer: GUTTER,
+        });
+    }
+
+    public render = () => {
         // Render your grid
         return (
-            <Masonry
-                autoHeight={true}
-                cellCount={list.length}
-                cellMeasurerCache={cache}
-                cellPositioner={cellPositioner}
-                // @ts-ignore
-                cellRenderer={this.cellRenderer}
-                width={this.width}
-                height={this.height}
-                ref={this._setMasonryRef}
-            />
+            <WindowScroller scrollElement={window}>
+                {({height, isScrolling, onChildScroll, scrollTop}) => (
+                    <div>
+                        <AutoSizer disableHeight onResize={this.onResize}>
+                            {({width}) => (
+                                <Masonry
+                                    cellCount={this.state.items.length}
+                                    cellMeasurerCache={this.cache}
+                                    cellPositioner={this.cellPositioner}
+                                    cellRenderer={this.cellRenderer}
+                                    height={height}
+                                    width={width}
+                                    autoHeight
+                                    ref={(r: Masonry) => this.masonry = r}
+                                    scrollTop={scrollTop}
+                                />
+                            )}
+                        </AutoSizer>
+                    </div>
+                )}
+            </WindowScroller>
         );
     }
 }

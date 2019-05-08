@@ -7,7 +7,8 @@ import {
     Masonry,
     AutoSizer,
     WindowScroller,
-    Positioner
+    Positioner,
+    MasonryCellProps
 } from 'react-virtualized';
 import GalleryItem from "../models/GalleryItem";
 
@@ -29,7 +30,8 @@ const IMAGE_WIDTH = 200;
 // ];
 
 type GalleryState = {
-    items: GalleryItem[]
+    items: Map<number,GalleryItem>,
+    lastId: number
 }
 
 export class Gallery extends React.Component<any,GalleryState> {
@@ -42,13 +44,25 @@ export class Gallery extends React.Component<any,GalleryState> {
 
     constructor(props) {
         super(props);
+
+
         this.state = {
-            items: [
-                {thumbnailImageURL: "https://cdnb.artstation.com/p/assets/covers/images/017/685/915/micro_square/timo-peter-artstation-title-image.jpg?1556957002", itemURL:"https://www.artstation.com"},
-                {thumbnailImageURL: "https://cdnb.artstation.com/p/assets/covers/images/017/685/915/micro_square/timo-peter-artstation-title-image.jpg?1556957002", itemURL:"https://www.artstation.com"},
-                {thumbnailImageURL: "https://cdnb.artstation.com/p/assets/covers/images/017/685/915/micro_square/timo-peter-artstation-title-image.jpg?1556957002", itemURL:"https://www.artstation.com"},
-                {thumbnailImageURL: "https://cdnb.artstation.com/p/assets/covers/images/017/685/915/micro_square/timo-peter-artstation-title-image.jpg?1556957002", itemURL:"https://www.artstation.com"},
-            ]
+            items: new Map<number,GalleryItem>( [
+                [0,{id:1,thumbnailImageURL: "https://cdnb.artstation.com/p/assets/covers/images/017/685/915/micro_square/timo-peter-artstation-title-image.jpg?1556957002",
+                    itemURL:"https://www.artstation.com"}],
+                [1,{id:2,thumbnailImageURL: "https://cdnb.artstation.com/p/assets/covers/images/017/685/915/micro_square/timo-peter-artstation-title-image.jpg?1556957002",
+                    itemURL:"https://www.artstation.com"}],
+                [2,{id:3,thumbnailImageURL: "https://cdnb.artstation.com/p/assets/covers/images/017/685/915/micro_square/timo-peter-artstation-title-image.jpg?1556957002",
+                    itemURL:"https://www.artstation.com"}],
+                [3,{id:4,thumbnailImageURL: "https://cdnb.artstation.com/p/assets/covers/images/017/685/915/micro_square/timo-peter-artstation-title-image.jpg?1556957002", itemURL:"https://www.artstation.com"}],
+                [4,{id:4,thumbnailImageURL: "https://cdnb.artstation.com/p/assets/covers/images/017/685/915/micro_square/timo-peter-artstation-title-image.jpg?1556957002", itemURL:"https://www.artstation.com"}],
+                [5,{id:5,thumbnailImageURL: "https://cdnb.artstation.com/p/assets/covers/images/017/685/915/micro_square/timo-peter-artstation-title-image.jpg?1556957002", itemURL:"https://www.artstation.com"}],
+                [6,{id:6,thumbnailImageURL: "https://cdnb.artstation.com/p/assets/covers/images/017/685/915/micro_square/timo-peter-artstation-title-image.jpg?1556957002", itemURL:"https://www.artstation.com"}],
+                [7,{id:7,thumbnailImageURL: "https://cdnb.artstation.com/p/assets/covers/images/017/685/915/micro_square/timo-peter-artstation-title-image.jpg?1556957002", itemURL:"https://www.artstation.com"}],
+                [8,{id:8,thumbnailImageURL: "https://cdnb.artstation.com/p/assets/covers/images/017/685/915/micro_square/timo-peter-artstation-title-image.jpg?1556957002", itemURL:"https://www.artstation.com"}],
+                [9,{id:9,thumbnailImageURL: "https://cdnb.artstation.com/p/assets/covers/images/017/685/915/micro_square/timo-peter-artstation-title-image.jpg?1556957002", itemURL:"https://www.artstation.com"}],
+            ]),
+            lastId:5
         };
 
         this.height = 600;
@@ -79,9 +93,15 @@ export class Gallery extends React.Component<any,GalleryState> {
         this.masonry.recomputeCellPositions();
     }
 
-    cellRenderer = (cellProps: any) => {
+    cellRenderer = (cellProps: MasonryCellProps) => {
+        console.log("cellProps: "); console.log(cellProps);
         const items = this.state.items;
-        const item = items[cellProps.index];
+        // this is from the masonry example
+        const item = items.get(cellProps.index % items.size);
+        if (typeof item !== "object") {
+
+            throw new Error("Missing item")
+        };
 
         return (
             <CellMeasurer
@@ -109,6 +129,24 @@ export class Gallery extends React.Component<any,GalleryState> {
         });
     }
 
+    generateItem = (): GalleryItem => {
+        let prevState = Object.assign({}, this.state);
+        // @ts-ignore since this is not actually read only but the react types are fucked
+        prevState.lastId = prevState.lastId + 1;
+        this.setState(prevState);
+        return {id: this.state.lastId, thumbnailImageURL: "https://cdnb.artstation.com/p/assets/covers/images/017/685/915/micro_square/timo-peter-artstation-title-image.jpg?1556957002", itemURL:"https://www.artstation.com"}
+    }
+
+
+
+    onScroll = (params: {clientHeight: number,scrollHeight: number, scrollTop: number}) => {
+        console.log("onScroll ran");
+        console.log("clientHeight: "+params.clientHeight+" scrollHeight: "+params.scrollHeight
+            +" scrollTop: "+params.scrollTop);
+
+        this.generateItem();
+    }
+
     public render = () => {
         // Render your grid
         return (
@@ -117,17 +155,19 @@ export class Gallery extends React.Component<any,GalleryState> {
                     <div>
                         <AutoSizer disableHeight onResize={this.onResize}>
                             {({width}) => (
-                                <Masonry
-                                    cellCount={this.state.items.length}
-                                    cellMeasurerCache={this.cache}
-                                    cellPositioner={this.cellPositioner}
-                                    cellRenderer={this.cellRenderer}
-                                    height={height}
-                                    width={width}
-                                    autoHeight
-                                    ref={(r: Masonry) => this.masonry = r}
-                                    scrollTop={scrollTop}
-                                />
+
+                                    <Masonry
+                                        cellCount={this.state.items.size}
+                                        cellMeasurerCache={this.cache}
+                                        cellPositioner={this.cellPositioner}
+                                        cellRenderer={this.cellRenderer}
+                                        height={height}
+                                        width={width}
+                                        onScroll={this.onScroll}
+                                        autoHeight
+                                        ref={(r: Masonry) => this.masonry = r}
+                                        scrollTop={scrollTop}
+                                    />
                             )}
                         </AutoSizer>
                     </div>

@@ -11,6 +11,7 @@ import {
     MasonryCellProps
 } from 'react-virtualized';
 import GalleryItem from "../models/GalleryItem";
+import ArtStationAPI from "../api/ArtStationAPI";
 
 const GUTTER = 1;
 const COLUMN_WIDTH = 200;
@@ -31,7 +32,8 @@ const IMAGE_WIDTH = 200;
 
 type GalleryState = {
     items: Map<number,GalleryItem>,
-    lastId: number
+    lastId: number,
+    pageNumber: number,
 }
 
 export class Gallery extends React.Component<any,GalleryState> {
@@ -47,22 +49,9 @@ export class Gallery extends React.Component<any,GalleryState> {
 
 
         this.state = {
-            items: new Map<number,GalleryItem>( [
-                [0,{id:1,thumbnailImageURL: "https://cdnb.artstation.com/p/assets/covers/images/017/685/915/micro_square/timo-peter-artstation-title-image.jpg?1556957002",
-                    itemURL:"https://www.artstation.com"}],
-                [1,{id:2,thumbnailImageURL: "https://cdnb.artstation.com/p/assets/covers/images/017/685/915/micro_square/timo-peter-artstation-title-image.jpg?1556957002",
-                    itemURL:"https://www.artstation.com"}],
-                [2,{id:3,thumbnailImageURL: "https://cdnb.artstation.com/p/assets/covers/images/017/685/915/micro_square/timo-peter-artstation-title-image.jpg?1556957002",
-                    itemURL:"https://www.artstation.com"}],
-                [3,{id:4,thumbnailImageURL: "https://cdnb.artstation.com/p/assets/covers/images/017/685/915/micro_square/timo-peter-artstation-title-image.jpg?1556957002", itemURL:"https://www.artstation.com"}],
-                [4,{id:4,thumbnailImageURL: "https://cdnb.artstation.com/p/assets/covers/images/017/685/915/micro_square/timo-peter-artstation-title-image.jpg?1556957002", itemURL:"https://www.artstation.com"}],
-                [5,{id:5,thumbnailImageURL: "https://cdnb.artstation.com/p/assets/covers/images/017/685/915/micro_square/timo-peter-artstation-title-image.jpg?1556957002", itemURL:"https://www.artstation.com"}],
-                [6,{id:6,thumbnailImageURL: "https://cdnb.artstation.com/p/assets/covers/images/017/685/915/micro_square/timo-peter-artstation-title-image.jpg?1556957002", itemURL:"https://www.artstation.com"}],
-                [7,{id:7,thumbnailImageURL: "https://cdnb.artstation.com/p/assets/covers/images/017/685/915/micro_square/timo-peter-artstation-title-image.jpg?1556957002", itemURL:"https://www.artstation.com"}],
-                [8,{id:8,thumbnailImageURL: "https://cdnb.artstation.com/p/assets/covers/images/017/685/915/micro_square/timo-peter-artstation-title-image.jpg?1556957002", itemURL:"https://www.artstation.com"}],
-                [9,{id:9,thumbnailImageURL: "https://cdnb.artstation.com/p/assets/covers/images/017/685/915/micro_square/timo-peter-artstation-title-image.jpg?1556957002", itemURL:"https://www.artstation.com"}],
-            ]),
-            lastId:5
+            items: new Map<number,GalleryItem>(),
+            lastId:0,
+            pageNumber: 1,
         };
 
         this.height = 600;
@@ -83,6 +72,27 @@ export class Gallery extends React.Component<any,GalleryState> {
             columnWidth: 200,
             spacer: 10
         });
+
+
+    }
+
+
+    stateAddPageItems = async (items: GalleryItem[]) => {
+        let previousState = Object.assign({}, this.state);
+        items.forEach((item) => {
+            previousState.items.set(previousState.lastId,item);
+            // @ts-ignore
+            previousState.lastId++;
+        });
+        // @ts-ignore ignored due to broken react types
+        previousState.pageNumber++;
+        await this.setState(previousState);
+    }
+
+    getNewPage = async () => {
+        // get initial page of results to get us started
+        const items = await ArtStationAPI.getGalleryItems(this.state.pageNumber);
+        await this.stateAddPageItems(items);
     }
 
 
@@ -95,6 +105,8 @@ export class Gallery extends React.Component<any,GalleryState> {
 
     cellRenderer = (cellProps: MasonryCellProps) => {
         const items = this.state.items;
+        console.log("Items: ");
+        console.log(items);
         // this is from the masonry example
         const item = items.get(cellProps.index % items.size);
         if (typeof item !== "object") {
@@ -146,17 +158,17 @@ export class Gallery extends React.Component<any,GalleryState> {
         await this.setState(previousState);
     }
 
-    getNewPage = async () => {
-        const sillyFunction = async (): Promise<any> => {
-            const item = await this.generateItem();
-            console.log("new item: "); console.log(item);
-            await this.stateAddItem(item);
-        }
-        let promises: Promise<any>[] = [];
-        for(let i=0;i<5;i++){
-            await sillyFunction();
-        }
-    }
+    // getNewPage = async () => {
+    //     const sillyFunction = async (): Promise<any> => {
+    //         const item = await this.generateItem();
+    //         console.log("new item: "); console.log(item);
+    //         await this.stateAddItem(item);
+    //     }
+    //     let promises: Promise<any>[] = [];
+    //     for(let i=0;i<5;i++){
+    //         await sillyFunction();
+    //     }
+    // }
 
     onScroll = async (params: {clientHeight: number,scrollHeight: number, scrollTop: number}) => {
         console.log("onScroll ran");

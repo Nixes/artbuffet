@@ -6,8 +6,11 @@ export default class ArtStationAPI {
     }
 
     public static async getGalleryItems(page: number): Promise<GalleryItem[]> {
-        const options = {};
-        const url = `https://www.artstation.com/projects.json?page=${page}&sorting=trending`;
+        const options = {
+            mode: "cors"
+        };
+        const url = `https://cors-anywhere.herokuapp.com/https://www.artstation.com/projects.json?page=${page}&sorting=trending`;
+        // @ts-ignore
         const response = await fetch(url,options);
         const json = await response.json();
         const artstationItems: [] = json.data;

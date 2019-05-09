@@ -60,7 +60,7 @@ export class Gallery extends React.Component<any,GalleryState> {
 
         // Default sizes help Masonry decide how many images to batch-measure
         this.cache = new CellMeasurerCache({
-            defaultHeight: 250,
+            defaultHeight: 200,
             defaultWidth: 200,
             fixedWidth: true,
         });
@@ -68,7 +68,7 @@ export class Gallery extends React.Component<any,GalleryState> {
         // Our masonry layout will use 3 columns with a 10px gutter between
         this.cellPositioner = createMasonryCellPositioner({
             cellMeasurerCache: this.cache,
-            columnCount: 3,
+            columnCount: this.columnCount,
             columnWidth: 200,
             spacer: 10
         });
@@ -105,14 +105,14 @@ export class Gallery extends React.Component<any,GalleryState> {
 
     cellRenderer = (cellProps: MasonryCellProps) => {
         const items = this.state.items;
-        console.log("Items: ");
-        console.log(items);
         // this is from the masonry example
         const item = items.get(cellProps.index % items.size);
         if (typeof item !== "object") {
+            console.log("Items: ");
+            console.log(items);
             throw new Error("Missing item")
         };
-
+        /* <div style={cellProps.style}> */
         return (
             <CellMeasurer
                 cache={this.cache}
@@ -120,9 +120,12 @@ export class Gallery extends React.Component<any,GalleryState> {
                 key={cellProps.key}
                 parent={cellProps.parent}
             >
-                <div style={cellProps.style}>
-                    <img width={IMAGE_WIDTH} height={IMAGE_HEIGHT} src={item.thumbnailImageURL}/>
-                </div>
+
+
+                    <img style={{ margin: 5
+
+                    }} height={IMAGE_HEIGHT} src={item.thumbnailImageURL}/>
+
             </CellMeasurer>
         );
     }
@@ -171,11 +174,12 @@ export class Gallery extends React.Component<any,GalleryState> {
     // }
 
     onScroll = async (params: {clientHeight: number,scrollHeight: number, scrollTop: number}) => {
-        console.log("onScroll ran");
-        console.log("clientHeight: "+params.clientHeight+" scrollHeight: "+params.scrollHeight
-            +" scrollTop: "+params.scrollTop);
+        // console.log("onScroll ran");
+        // console.log("clientHeight: "+params.clientHeight+" scrollHeight: "+params.scrollHeight
+        //     +" scrollTop: "+params.scrollTop);
 
         if ((params.scrollTop + params.clientHeight) >= params.scrollHeight) {
+            console.log("Getting new page");
             await this.getNewPage();
         }
     }

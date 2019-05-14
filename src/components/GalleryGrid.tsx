@@ -37,8 +37,7 @@ type GalleryState = {
 }
 
 export class GalleryGrid extends React.Component<any,GalleryState> {
-    private height: number;
-    private width: number;
+
     private columnCount: number;
     private cellPositioner: Positioner;
     private cache: CellMeasurerCache;
@@ -53,8 +52,6 @@ export class GalleryGrid extends React.Component<any,GalleryState> {
             pageNumber: 1,
         };
 
-        this.height = 600;
-        this.width = 800;
         this.columnCount = 4;
 
         // Default sizes help Masonry decide how many images to batch-measure

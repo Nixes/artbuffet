@@ -115,9 +115,8 @@ export class GalleryGrid extends React.Component<any,GalleryState> {
             console.log(items);
             throw new Error("Missing item")
         };
-        /* <div style={cellProps.style}> */
         return (
-            <img key={cellProps.key} style={{ margin: 0,padding:0}} width={IMAGE_WIDTH} height={IMAGE_HEIGHT} src={item.thumbnailImageURL}/>
+            <img key={cellProps.key} style={cellProps.style} width={IMAGE_WIDTH} height={IMAGE_HEIGHT} src={item.thumbnailImageURL}/>
         );
     }
 

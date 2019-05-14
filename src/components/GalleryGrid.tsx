@@ -103,8 +103,8 @@ export class GalleryGrid extends React.Component<any,GalleryState> {
 
     onResize = ({width}: any) => {
         this.cache.clearAll();
-        this.calculateColumnCount(width);
-        this.resetCellPositioner();
+        this.columnCount = this.calculateColumnCount(width);
+        // this.resetCellPositioner();
     }
 
     cellRenderer = (cellProps: GridCellProps) => {
@@ -120,12 +120,21 @@ export class GalleryGrid extends React.Component<any,GalleryState> {
         };
         /* <div style={cellProps.style}> */
         return (
-            <img key={cellProps.key} style={{ margin: 5}} height={IMAGE_HEIGHT} src={item.thumbnailImageURL}/>
+            <img key={cellProps.key} style={{ margin: 0,padding:0}} width={IMAGE_WIDTH} height={IMAGE_HEIGHT} src={item.thumbnailImageURL}/>
         );
     }
 
-    calculateColumnCount = (width: number) =>  {
-        this.columnCount = Math.floor((width + GUTTER) / (COLUMN_WIDTH + GUTTER));
+    /**
+     * returns number of columns, must be 1 or greater
+     * @param width
+     */
+    calculateColumnCount = (width: number): number =>  {
+        const calculatedColumnCount =  Math.floor((width + GUTTER) / (COLUMN_WIDTH + GUTTER));
+        if (calculatedColumnCount > 0) {
+            return calculatedColumnCount
+        } else {
+            return 1;
+        }
     }
 
     resetCellPositioner = () => {
@@ -172,7 +181,7 @@ export class GalleryGrid extends React.Component<any,GalleryState> {
             <WindowScroller scrollElement={window}>
                 {({height, isScrolling, onChildScroll, scrollTop}) => (
                     <div>
-                        <AutoSizer disableHeight>
+                        <AutoSizer id={"autosizer"} onResize={this.onResize} disableHeight>
                             {({width}) => (
 
                                     <Grid

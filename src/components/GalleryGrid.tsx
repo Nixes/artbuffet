@@ -41,9 +41,12 @@ export class GalleryGrid extends React.Component<any,GalleryState> {
     private columnCount: number;
     private cellPositioner: Positioner;
     private cache: CellMeasurerCache;
+    // locks downloading to one page only, so we don't download duplicated pages
+    private isDownloading: boolean;
 
     constructor(props) {
         super(props);
+        this.isDownloading = false;
 
 
         this.state = {
@@ -92,9 +95,11 @@ export class GalleryGrid extends React.Component<any,GalleryState> {
     }
 
     getNewPage = async () => {
+        this.isDownloading = true;
         // get initial page of results to get us started
         const items = await ArtStationAPI.getGalleryItems(this.state.pageNumber);
         await this.stateAddPageItems(items);
+        this.isDownloading = false;
     }
 
 
@@ -161,11 +166,15 @@ export class GalleryGrid extends React.Component<any,GalleryState> {
     }
 
     onScroll = async (params: {clientHeight: number,scrollHeight: number, scrollTop: number}) => {
+        // don't run if we are still waiting on a download
+        if (this.isDownloading) return;
         // console.log("onScroll ran");
         // console.log("clientHeight: "+params.clientHeight+" scrollHeight: "+params.scrollHeight
         //     +" scrollTop: "+params.scrollTop);
+        const preloadPages = 1;
+        const loadAheadOffset = params.clientHeight* preloadPages;
 
-        if ((params.scrollTop + params.clientHeight) >= params.scrollHeight) {
+        if ((params.scrollTop + params.clientHeight) >= (params.scrollHeight - loadAheadOffset)) {
             console.log("Getting new page");
             await this.getNewPage();
         }
@@ -179,7 +188,6 @@ export class GalleryGrid extends React.Component<any,GalleryState> {
                     <div>
                         <AutoSizer id={"autosizer"} onResize={this.onResize} disableHeight>
                             {({width}) => (
-
                                     <Grid
                                         columnCount={this.columnCount}
                                         cellRenderer={this.cellRenderer}

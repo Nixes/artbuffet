@@ -13,10 +13,10 @@ import {
 import GalleryItem from "../models/GalleryItem";
 import ArtStationAPI from "../api/ArtStationAPI";
 
-const GUTTER = 1;
-const COLUMN_WIDTH = 200;
-const IMAGE_HEIGHT = 200;
-const IMAGE_WIDTH = 200;
+// const GUTTER = 1;
+// const COLUMN_WIDTH = 200;
+// const IMAGE_HEIGHT = 200;
+// const IMAGE_WIDTH = 200;
 
 // Array of images with captions
 // const list: DatumImage[] = [
@@ -39,10 +39,13 @@ type GalleryState = {
 export class GalleryGrid extends React.Component<any,GalleryState> {
 
     private columnCount: number;
-    private cellPositioner: Positioner;
-    private cache: CellMeasurerCache;
     // locks downloading to one page only, so we don't download duplicated pages
     private isDownloading: boolean;
+
+    private IMAGE_WIDTH;
+    private IMAGE_HEIGHT;
+    private COLUMN_WIDTH;
+    private GUTTER = 0;
 
     constructor(props) {
         super(props);
@@ -57,22 +60,20 @@ export class GalleryGrid extends React.Component<any,GalleryState> {
 
         this.columnCount = 4;
 
-        // Default sizes help Masonry decide how many images to batch-measure
-        this.cache = new CellMeasurerCache({
-            defaultHeight: 200,
-            defaultWidth: 200,
-            fixedWidth: true,
-        });
-
-        // Our masonry layout will use 3 columns with a 10px gutter between
-        this.cellPositioner = createMasonryCellPositioner({
-            cellMeasurerCache: this.cache,
-            columnCount: this.columnCount,
-            columnWidth: 200,
-            spacer: 10
-        });
+        this.IMAGE_HEIGHT = GalleryGrid.calculatePixelValue(200);
+        this.IMAGE_WIDTH = GalleryGrid.calculatePixelValue(200);
+        this.COLUMN_WIDTH = GalleryGrid.calculatePixelValue(200);
 
         this.calculateRowCount();
+    }
+
+    private static calculatePixelValue = (realPixels: number): number => {
+        let pixelRatio = window.devicePixelRatio || 1;
+        // add some custom scaling for highdpi devices
+        if (pixelRatio > 1) {
+            pixelRatio = pixelRatio*0.6;
+        }
+        return Math.floor(realPixels/pixelRatio);
     }
 
     calculateRowCount = (): number => {
@@ -104,7 +105,6 @@ export class GalleryGrid extends React.Component<any,GalleryState> {
 
 
     onResize = ({width}: any) => {
-        this.cache.clearAll();
         this.columnCount = this.calculateColumnCount(width);
         // this.resetCellPositioner();
     }
@@ -122,7 +122,7 @@ export class GalleryGrid extends React.Component<any,GalleryState> {
         };
         return (
             <a href={item.itemURL}>
-                <img key={cellProps.key} style={cellProps.style} width={IMAGE_WIDTH} height={IMAGE_HEIGHT} src={item.thumbnailImageURL}/>
+                <img key={cellProps.key} style={cellProps.style} width={this.IMAGE_WIDTH} height={this.IMAGE_HEIGHT} src={item.thumbnailImageURL}/>
             </a>
         );
     }
@@ -132,20 +132,12 @@ export class GalleryGrid extends React.Component<any,GalleryState> {
      * @param width
      */
     calculateColumnCount = (width: number): number =>  {
-        const calculatedColumnCount =  Math.floor((width + GUTTER) / (COLUMN_WIDTH + GUTTER));
+        const calculatedColumnCount =  Math.floor((width + this.GUTTER) / (this.COLUMN_WIDTH + this.GUTTER));
         if (calculatedColumnCount > 0) {
             return calculatedColumnCount
         } else {
             return 1;
         }
-    }
-
-    resetCellPositioner = () => {
-        this.cellPositioner.reset({
-            columnCount: this.columnCount,
-            columnWidth: COLUMN_WIDTH,
-            spacer: GUTTER,
-        });
     }
 
     generateItem = async (): Promise<GalleryItem> => {
@@ -195,9 +187,9 @@ export class GalleryGrid extends React.Component<any,GalleryState> {
                                         cellRenderer={this.cellRenderer}
                                         height={height}
                                         width={width}
-                                        rowHeight={IMAGE_HEIGHT}
+                                        rowHeight={this.IMAGE_HEIGHT}
                                         rowCount={this.calculateRowCount()}
-                                        columnWidth={IMAGE_WIDTH}
+                                        columnWidth={this.IMAGE_WIDTH}
                                         onScroll={this.onScroll}
                                         autoHeight
                                         scrollTop={scrollTop}

@@ -1,6 +1,8 @@
 # ArtBuffet
 is a third party ArtStation gallery UI mainly aiming to solve its major performance problems when using its infinite scrolling interface
 
+You can see latest version in action at: https://nixes.github.io/artbuffet/index.html
+
 # Project Goal
 To have a much more pleasant infinite scroll experience, but with a similar high density layout to the original website
 

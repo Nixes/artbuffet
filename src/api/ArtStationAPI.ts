@@ -1,11 +1,18 @@
 import GalleryItem from "../models/GalleryItem";
 
-enum Sorting {
+enum SORT {
     TRENDING = 'trending',
     LATEST = 'latest',
     PICKS = 'picks',
     POPULARITY = 'popularity'
 }
+
+export const SORTING_AVAILABLE = [
+    SORT.TRENDING,
+    SORT.LATEST,
+    SORT.PICKS,
+    SORT.POPULARITY,
+];
 
 export default class ArtStationAPI {
     /**
@@ -13,7 +20,7 @@ export default class ArtStationAPI {
      * @param page
      * @param sorting optional
      */
-    public static async getGalleryItems(page: number,sorting: Sorting = Sorting.TRENDING): Promise<GalleryItem[]> {
+    public static async getGalleryItems(page: number,sorting: SORT = SORT.TRENDING): Promise<GalleryItem[]> {
         const options = {
             mode: "cors"
         };

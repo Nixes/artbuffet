@@ -41,5 +41,6 @@
   "devDependencies": {
     "@types/react-virtualized": "^9.21.1",
     "gh-pages": "^2.0.1"
-  }
+  },
+  "homepage": "."
 }

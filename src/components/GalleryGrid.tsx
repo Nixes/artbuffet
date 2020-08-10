@@ -85,6 +85,7 @@ export class GalleryGrid extends React.Component<any,GalleryState> {
         const items = await ArtStationAPI.getGalleryItems(this.state.pageNumber);
         await this.stateAddPageItems(items);
         this.isDownloading = false;
+        throw new Error("Dummy error for test");
     }
 
 

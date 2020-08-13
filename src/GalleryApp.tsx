@@ -3,16 +3,15 @@ import logo from './logo.svg';
 import './App.css';
 import {Gallery} from "./components/Gallery";
 import {GalleryGrid} from "./components/GalleryGrid";
-import {ErrorBoundryWrapper} from "./components/ErrorBoundryWrapper";
+import {ErrorHandler} from "./components/errorhandler/ErrorHandler";
 
 
 
 const GalleryApp: React.FC = () => {
   return (
     <div className="App">
-        <ErrorBoundryWrapper>
-            <GalleryGrid></GalleryGrid>
-        </ErrorBoundryWrapper>
+        <ErrorHandler></ErrorHandler>
+        <GalleryGrid></GalleryGrid>
     </div>
   );
 }

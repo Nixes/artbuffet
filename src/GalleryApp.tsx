@@ -3,13 +3,15 @@ import logo from './logo.svg';
 import './App.css';
 import {Gallery} from "./components/Gallery";
 import {GalleryGrid} from "./components/GalleryGrid";
+import {ErrorHandler} from "./components/errorhandler/ErrorHandler";
 
 
 
 const GalleryApp: React.FC = () => {
   return (
     <div className="App">
-      <GalleryGrid></GalleryGrid>
+        <ErrorHandler></ErrorHandler>
+        <GalleryGrid></GalleryGrid>
     </div>
   );
 }

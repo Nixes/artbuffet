@@ -1,6 +1,6 @@
 import GalleryItem from "../models/GalleryItem";
 
-enum SORT {
+export enum SORT {
     TRENDING = 'trending',
     LATEST = 'latest',
     PICKS = 'picks',

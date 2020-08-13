@@ -11,7 +11,7 @@ import {
     GridCellProps
 } from 'react-virtualized';
 import GalleryItem from "../models/GalleryItem";
-import ArtStationAPI from "../api/ArtStationAPI";
+import ArtStationAPI, {SORT} from "../api/ArtStationAPI";
 
 
 type GalleryState = {
@@ -20,7 +20,7 @@ type GalleryState = {
     pageNumber: number,
 }
 
-export class GalleryGrid extends React.Component<any,GalleryState> {
+export class GalleryGrid extends React.Component<{sortOrder: SORT},GalleryState> {
 
     private columnCount: number;
     // locks downloading to one page only, so we don't download duplicated pages
@@ -47,8 +47,22 @@ export class GalleryGrid extends React.Component<any,GalleryState> {
         this.IMAGE_HEIGHT = GalleryGrid.calculatePixelValue(200);
         this.IMAGE_WIDTH = GalleryGrid.calculatePixelValue(200);
         this.COLUMN_WIDTH = GalleryGrid.calculatePixelValue(200);
+    }
 
-        this.calculateRowCount();
+    private resetChildState = () => {
+        this.setState({
+            items: new Map<number,GalleryItem>(),
+            lastId:0,
+            pageNumber: 1,
+        })
+    };
+
+    componentDidUpdate(prevProps, prevState) {
+        if(this.props.sortOrder!== prevProps.sortOrder) {
+            // if sort order changed, then we need to rerender the entire gallery
+            console.log('Rerendering gallery since sort order changed to: '+this.props.sortOrder);
+            this.resetChildState();
+        }
     }
 
     private static calculatePixelValue = (realPixels: number): number => {
@@ -82,7 +96,7 @@ export class GalleryGrid extends React.Component<any,GalleryState> {
     getNewPage = async () => {
         this.isDownloading = true;
         // get initial page of results to get us started
-        const items = await ArtStationAPI.getGalleryItems(this.state.pageNumber);
+        const items = await ArtStationAPI.getGalleryItems(this.state.pageNumber,this.props.sortOrder);
         await this.stateAddPageItems(items);
         this.isDownloading = false;
     }

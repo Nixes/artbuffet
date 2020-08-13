@@ -3,7 +3,7 @@ import ArtStationAPI, {SORT, SORTING_AVAILABLE} from "../api/ArtStationAPI";
 import {AutoSizer, Grid, GridCellProps, WindowScroller} from "react-virtualized";
 import React from "react";
 
-export class OptionsMenu extends React.PureComponent<any,{sortingOptions:SORT[],selectedSorting:number,value:string}> {
+export class OptionsMenu extends React.PureComponent<{changeSortOrder: (newSortOrder:SORT) => void },{sortingOptions:SORT[],selectedSorting:number,value:SORT}> {
 
     constructor(props) {
         super(props);
@@ -17,10 +17,10 @@ export class OptionsMenu extends React.PureComponent<any,{sortingOptions:SORT[],
 
     private handleChange = (event) => {
         this.setState({value: event.target.value});
+        this.props.changeSortOrder(event.target.value);
     }
 
     public render = () => {
-        // Render your grid
         return (
             <div id="options-bar"><p>This is where selection options will appear. Current mode: {this.state.value}</p>
                 <select value={this.state.value} onChange={this.handleChange}>

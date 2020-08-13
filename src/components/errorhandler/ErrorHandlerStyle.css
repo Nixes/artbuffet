@@ -1,0 +1,15 @@
+#error-message-container {
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    z-index: 255;
+}
+
+#error-message {
+    display: inline-block;
+    width:auto;
+    margin: 0 auto;
+    padding: 10px;
+    background: #750400;
+    color: white;
+}

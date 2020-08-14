@@ -19,8 +19,6 @@ class GalleryApp extends React.PureComponent<any, {sortOrder:SORT}> {
     }
 
     private changeSortOrder = (newSortOrder: SORT) => {
-        console.log("Change sort order called: ");
-        console.log(newSortOrder);
         this.setState({sortOrder: newSortOrder});
     }
 

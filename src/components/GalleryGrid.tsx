@@ -18,11 +18,10 @@ type GalleryState = {
     items: Map<number,GalleryItem>,
     lastId: number,
     pageNumber: number,
+    columnCount: number
 }
 
 export class GalleryGrid extends React.Component<{sortOrder: SORT},GalleryState> {
-
-    private columnCount: number;
     // locks downloading to one page only, so we don't download duplicated pages
     private isDownloading: boolean;
 
@@ -40,9 +39,8 @@ export class GalleryGrid extends React.Component<{sortOrder: SORT},GalleryState>
             items: new Map<number,GalleryItem>(),
             lastId:0,
             pageNumber: 1,
+            columnCount: 4
         };
-
-        this.columnCount = 4;
 
         this.IMAGE_HEIGHT = GalleryGrid.calculatePixelValue(200);
         this.IMAGE_WIDTH = GalleryGrid.calculatePixelValue(200);
@@ -54,13 +52,17 @@ export class GalleryGrid extends React.Component<{sortOrder: SORT},GalleryState>
             items: new Map<number,GalleryItem>(),
             lastId:0,
             pageNumber: 1,
-        })
+            columnCount: 4
+        });
+
+        this.isDownloading = false;
+        // need to forceload at least one page
+        this.getNewPage();
     };
 
     componentDidUpdate(prevProps, prevState) {
         if(this.props.sortOrder!== prevProps.sortOrder) {
             // if sort order changed, then we need to rerender the entire gallery
-            console.log('Rerendering gallery since sort order changed to: '+this.props.sortOrder);
             this.resetChildState();
         }
     }
@@ -75,9 +77,9 @@ export class GalleryGrid extends React.Component<{sortOrder: SORT},GalleryState>
     }
 
     calculateRowCount = (): number => {
-        const rowCount = Math.floor(this.state.items.size / this.columnCount);
+        const rowCount = Math.floor(this.state.items.size / this.state.columnCount);
         console.log("Row count calcuated as: "+rowCount);
-        console.log("Number of items: "+this.state.items.size+"columnCount: "+this.columnCount);
+        console.log("Number of items: "+this.state.items.size+"columnCount: "+this.state.columnCount);
         return rowCount
     }
 
@@ -101,14 +103,20 @@ export class GalleryGrid extends React.Component<{sortOrder: SORT},GalleryState>
         this.isDownloading = false;
     }
 
+    private setColumnCount(columnCount:number) {
+        let prevState = Object.assign([],this.state);
+        // @ts-ignore
+        prevState.columnCount = columnCount;
+        this.setState(prevState);
+    }
 
     onResize = ({width}: any) => {
-        this.columnCount = this.calculateColumnCount(width);
+        this.setColumnCount(this.calculateColumnCount(width));
         // this.resetCellPositioner();
     }
 
     cellRenderer = (cellProps: GridCellProps) => {
-        const correctIndex = (cellProps.rowIndex * this.columnCount) +cellProps.columnIndex;
+        const correctIndex = (cellProps.rowIndex * this.state.columnCount) +cellProps.columnIndex;
         console.log("key: "+cellProps.key+" index: "+correctIndex);
         const items = this.state.items;
         // this is from the masonry example
@@ -181,7 +189,7 @@ export class GalleryGrid extends React.Component<{sortOrder: SORT},GalleryState>
                         <AutoSizer id={"autosizer"} onResize={this.onResize} disableHeight>
                             {({width}) => (
                                     <Grid
-                                        columnCount={this.columnCount}
+                                        columnCount={this.state.columnCount}
                                         cellRenderer={this.cellRenderer}
                                         height={height}
                                         width={width}

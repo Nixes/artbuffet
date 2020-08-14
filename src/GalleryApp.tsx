@@ -1,19 +1,38 @@
 import React from 'react';
-import logo from './logo.svg';
 import './App.css';
-import {Gallery} from "./components/Gallery";
 import {GalleryGrid} from "./components/GalleryGrid";
+import {OptionsMenu} from "./components/OptionsMenu";
 import {ErrorHandler} from "./components/errorhandler/ErrorHandler";
+import ArtStationAPI, {SORT} from "./api/ArtStationAPI";
+import {GalleryAPIInterface} from "./api/GalleryAPIInterface";
 
 
 
-const GalleryApp: React.FC = () => {
-  return (
-    <div className="App">
-        <ErrorHandler></ErrorHandler>
-        <GalleryGrid></GalleryGrid>
-    </div>
-  );
+class GalleryApp extends React.PureComponent<any, {sortOrder:string}> {
+    private galleryAPI: GalleryAPIInterface;
+
+
+    constructor(props) {
+        super(props);
+
+        this.galleryAPI = new ArtStationAPI();
+
+        this.state = {
+            sortOrder:SORT.TRENDING
+        };
+    }
+
+    private changeSortOrder = (newSortOrder: string) => {
+        this.setState({sortOrder: newSortOrder});
+    }
+
+    render() {
+        return <div className="App">
+            <OptionsMenu changeSortOrder={this.changeSortOrder} defaultSortOrder={this.state.sortOrder} sortingOptions={this.galleryAPI.AVAILABLE_SORT_ORDERS}></OptionsMenu>
+            <ErrorHandler></ErrorHandler>
+            <GalleryGrid galleryAPI={this.galleryAPI} sortOrder={this.state.sortOrder}></GalleryGrid>
+        </div>
+    }
 }
 
 export default GalleryApp;

@@ -1,16 +1,14 @@
-import GalleryItem from "../models/GalleryItem";
-import ArtStationAPI, {SORT, SORTING_AVAILABLE} from "../api/ArtStationAPI";
-import {AutoSizer, Grid, GridCellProps, WindowScroller} from "react-virtualized";
 import React from "react";
 
-export class OptionsMenu extends React.PureComponent<{changeSortOrder: (newSortOrder:SORT) => void },{sortingOptions:SORT[],selectedSorting:number,value:SORT}> {
+export class OptionsMenu extends React.PureComponent<
+    {changeSortOrder: (newSortOrder:string) => void, sortingOptions: string[], defaultSortOrder: string },
+    {selectedSorting:number,value:string}> {
 
     constructor(props) {
         super(props);
 
         this.state = {
-            value:SORT.TRENDING,
-            sortingOptions: SORTING_AVAILABLE,
+            value: props.defaultSortOrder,
             selectedSorting:0,
         };
     }
@@ -25,8 +23,9 @@ export class OptionsMenu extends React.PureComponent<{changeSortOrder: (newSortO
             <div id="options-bar">
                 <label htmlFor='sortOrderSelector'>Sort Order </label>
                 <select id='sortOrderSelector' value={this.state.value} onChange={this.handleChange}>
-                    <option value="trending">trending</option>
-                    <option value="latest">latest</option>
+                    {this.props.sortingOptions.map(function(name, index){
+                        return <option key={ index } value={name}>{name}</option>;
+                    })}
                 </select>
             </div>
         );

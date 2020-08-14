@@ -1,32 +1,36 @@
 import React from 'react';
-import logo from './logo.svg';
 import './App.css';
-import {Gallery} from "./components/Gallery";
 import {GalleryGrid} from "./components/GalleryGrid";
 import {OptionsMenu} from "./components/OptionsMenu";
 import {ErrorHandler} from "./components/errorhandler/ErrorHandler";
-import {SORT} from "./api/ArtStationAPI";
+import ArtStationAPI, {SORT} from "./api/ArtStationAPI";
+import {GalleryAPIInterface} from "./api/GalleryAPIInterface";
 
 
 
-class GalleryApp extends React.PureComponent<any, {sortOrder:SORT}> {
+class GalleryApp extends React.PureComponent<any, {sortOrder:string}> {
+    private galleryAPI: GalleryAPIInterface;
+
+
     constructor(props) {
         super(props);
+
+        this.galleryAPI = new ArtStationAPI();
 
         this.state = {
             sortOrder:SORT.TRENDING
         };
     }
 
-    private changeSortOrder = (newSortOrder: SORT) => {
+    private changeSortOrder = (newSortOrder: string) => {
         this.setState({sortOrder: newSortOrder});
     }
 
-    render(): React.ReactElement<any, string | React.JSXElementConstructor<any>> | string | number | {} | React.ReactNodeArray | React.ReactPortal | boolean | null | undefined {
+    render() {
         return <div className="App">
-            <OptionsMenu changeSortOrder={this.changeSortOrder}></OptionsMenu>
+            <OptionsMenu changeSortOrder={this.changeSortOrder} defaultSortOrder={this.state.sortOrder} sortingOptions={this.galleryAPI.AVAILABLE_SORT_ORDERS}></OptionsMenu>
             <ErrorHandler></ErrorHandler>
-            <GalleryGrid sortOrder={this.state.sortOrder}></GalleryGrid>
+            <GalleryGrid galleryAPI={this.galleryAPI} sortOrder={this.state.sortOrder}></GalleryGrid>
         </div>
     }
 }

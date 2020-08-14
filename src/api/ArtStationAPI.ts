@@ -1,4 +1,5 @@
 import GalleryItem from "../models/GalleryItem";
+import {GalleryAPIInterface} from "./GalleryAPIInterface";
 
 export enum SORT {
     TRENDING = 'trending',
@@ -7,24 +8,38 @@ export enum SORT {
     POPULARITY = 'popularity'
 }
 
-export const SORTING_AVAILABLE = [
-    SORT.TRENDING,
-    SORT.LATEST,
-    SORT.PICKS,
-    SORT.POPULARITY,
-];
+export default class ArtStationAPI implements GalleryAPIInterface {
+    constructor(baseURL:string = 'https://cors-anywhere.herokuapp.com/https://www.artstation.com') {
+        this.baseURL = baseURL;
+    }
+    public readonly AVAILABLE_SORT_ORDERS = [
+        SORT.TRENDING,
+        SORT.LATEST,
+        SORT.PICKS,
+        SORT.POPULARITY,
+    ];
+    private baseURL: string;
 
-export default class ArtStationAPI {
+    public isValidSortOrder(sortOrder:string): boolean {
+        const found = this.AVAILABLE_SORT_ORDERS.find(function (value) {
+            return value === sortOrder;
+        });
+        return (found !== undefined);
+    }
+
     /**
      *
      * @param page
      * @param sorting optional
      */
-    public static async getGalleryItems(page: number,sorting: SORT = SORT.TRENDING): Promise<GalleryItem[]> {
+    public async getGalleryItems(page: number,sorting: string): Promise<GalleryItem[]> {
+        if (!this.isValidSortOrder(sorting)) {
+            throw new Error('Invalid sort order: '+sorting)
+        }
         const options = {
             mode: "cors"
         };
-        const url = `https://cors-anywhere.herokuapp.com/https://www.artstation.com/projects.json?page=${page}&sorting=${sorting}`;
+        const url = `${this.baseURL}/projects.json?page=${page}&sorting=${sorting}`;
         // @ts-ignore this typecheck is incorrect
         const response = await fetch(url,options);
         const json = await response.json();

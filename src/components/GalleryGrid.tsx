@@ -12,6 +12,7 @@ import {
 } from 'react-virtualized';
 import GalleryItem from "../models/GalleryItem";
 import ArtStationAPI, {SORT} from "../api/ArtStationAPI";
+import {GalleryAPIInterface} from "../api/GalleryAPIInterface";
 
 
 type GalleryState = {
@@ -21,7 +22,7 @@ type GalleryState = {
     columnCount: number
 }
 
-export class GalleryGrid extends React.Component<{sortOrder: SORT},GalleryState> {
+export class GalleryGrid extends React.Component<{galleryAPI: GalleryAPIInterface,sortOrder: string},GalleryState> {
     // locks downloading to one page only, so we don't download duplicated pages
     private isDownloading: boolean;
 
@@ -33,7 +34,6 @@ export class GalleryGrid extends React.Component<{sortOrder: SORT},GalleryState>
     constructor(props) {
         super(props);
         this.isDownloading = false;
-
 
         this.state = {
             items: new Map<number,GalleryItem>(),
@@ -98,7 +98,7 @@ export class GalleryGrid extends React.Component<{sortOrder: SORT},GalleryState>
     getNewPage = async () => {
         this.isDownloading = true;
         // get initial page of results to get us started
-        const items = await ArtStationAPI.getGalleryItems(this.state.pageNumber,this.props.sortOrder);
+        const items = await this.props.galleryAPI.getGalleryItems(this.state.pageNumber,this.props.sortOrder);
         await this.stateAddPageItems(items);
         this.isDownloading = false;
     }

@@ -22,8 +22,9 @@ export class OptionsMenu extends React.PureComponent<{changeSortOrder: (newSortO
 
     public render = () => {
         return (
-            <div id="options-bar"><p>This is where selection options will appear. Current mode: {this.state.value}</p>
-                <select value={this.state.value} onChange={this.handleChange}>
+            <div id="options-bar">
+                <label htmlFor='sortOrderSelector'>Sort Order </label>
+                <select id='sortOrderSelector' value={this.state.value} onChange={this.handleChange}>
                     <option value="trending">trending</option>
                     <option value="latest">latest</option>
                 </select>

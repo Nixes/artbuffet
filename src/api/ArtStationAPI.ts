@@ -44,8 +44,14 @@ export default class ArtStationAPI implements GalleryAPIInterface {
         const response = await fetch(url,options);
         const json = await response.json();
         const artstationItems: [] = json.data;
-        const convertedItems: GalleryItem[] = artstationItems.map((artstationItem:any)=>{
-            return {id:artstationItem.id,itemURL:artstationItem.permalink,thumbnailImageURL:artstationItem.cover.micro_square_image_url};
+        const convertedItems: GalleryItem[] = artstationItems.flatMap((artstationItem:any)=>{
+            // check that there was cover art, some entries with no uploaded assets don't have any
+            if (artstationItem.cover !== undefined && artstationItem.cover.micro_square_image_url !== undefined) {
+                let result = {id:artstationItem.id,itemURL:artstationItem.permalink,thumbnailImageURL:artstationItem.cover.micro_square_image_url};
+                return [result]
+            }
+
+            return [];
         });
         return convertedItems;
     }

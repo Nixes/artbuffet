@@ -1,14 +1,14 @@
 {
   "files": {
     "main.css": "/artbuffet/static/css/main.3607421d.chunk.css",
-    "main.js": "/artbuffet/static/js/main.868f5232.chunk.js",
-    "main.js.map": "/artbuffet/static/js/main.868f5232.chunk.js.map",
+    "main.js": "/artbuffet/static/js/main.1d47a9e5.chunk.js",
+    "main.js.map": "/artbuffet/static/js/main.1d47a9e5.chunk.js.map",
     "runtime~main.js": "/artbuffet/static/js/runtime~main.a776686e.js",
     "runtime~main.js.map": "/artbuffet/static/js/runtime~main.a776686e.js.map",
     "static/js/2.5314b694.chunk.js": "/artbuffet/static/js/2.5314b694.chunk.js",
     "static/js/2.5314b694.chunk.js.map": "/artbuffet/static/js/2.5314b694.chunk.js.map",
     "index.html": "/artbuffet/index.html",
-    "precache-manifest.d7658c750b28bad7e83dc0f2495231a4.js": "/artbuffet/precache-manifest.d7658c750b28bad7e83dc0f2495231a4.js",
+    "precache-manifest.1e20487265740d5528af50d7542895a9.js": "/artbuffet/precache-manifest.1e20487265740d5528af50d7542895a9.js",
     "service-worker.js": "/artbuffet/service-worker.js",
     "static/css/main.3607421d.chunk.css.map": "/artbuffet/static/css/main.3607421d.chunk.css.map"
   }

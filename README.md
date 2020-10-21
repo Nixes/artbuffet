@@ -7,8 +7,8 @@ You can see latest version in action at: https://nixes.github.io/artbuffet/index
 To have a much more pleasant infinite scroll experience, but with a similar high density layout to the original website
 
 # Road Map
-* Store current scroll progress so a user can come back to a page and resume from mostly the same place
-* Make code more general and create a simplistic api to allow other galleries to be plugged in easily
+- [ ] Store current scroll progress so a user can come back to a page and resume from mostly the same place
+- [x] Make code more general and create a simplistic api to allow other galleries to be plugged in easily
 
 ## Available Scripts
 

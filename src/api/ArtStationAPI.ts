@@ -37,7 +37,11 @@ export default class ArtStationAPI implements GalleryAPIInterface {
             throw new Error('Invalid sort order: '+sorting)
         }
         const options = {
-            mode: "cors"
+            mode: "cors",
+            // accept: "application/json"
+            headers: {
+                'Content-Type': 'application/json'
+            },
         };
         const url = `${this.baseURL}/projects.json?page=${page}&sorting=${sorting}`;
         // @ts-ignore this typecheck is incorrect

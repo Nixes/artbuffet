@@ -15,7 +15,11 @@ class GalleryApp extends React.PureComponent<any, {sortOrder:string}> {
     constructor(props) {
         super(props);
 
-        this.galleryAPI = new ArtStationAPI();
+        if (!process.env.NODE_ENV || process.env.NODE_ENV === 'development') {
+            this.galleryAPI = new ArtStationAPI('http://localhost:3000');
+        } else {
+            this.galleryAPI = new ArtStationAPI();
+        }
 
         this.state = {
             sortOrder:SORT.TRENDING

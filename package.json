@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "homepage": "http://nixes.github.io/artbuffet",
+  "proxy": "https://www.artstation.com",
   "dependencies": {
     "@babel/runtime": "^7.10.5",
     "@types/jest": "24.0.12",

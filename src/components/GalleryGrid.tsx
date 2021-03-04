@@ -43,9 +43,13 @@ export class GalleryGrid extends React.PureComponent<{galleryAPI: GalleryAPIInte
             columnCount: 4
         };
 
-        this.IMAGE_HEIGHT = GalleryGrid.calculatePixelValue(200);
-        this.IMAGE_WIDTH = GalleryGrid.calculatePixelValue(200);
-        this.COLUMN_WIDTH = GalleryGrid.calculatePixelValue(200);
+        // this.IMAGE_HEIGHT = GalleryGrid.calculatePixelValue(200);
+        // this.IMAGE_WIDTH = GalleryGrid.calculatePixelValue(200);
+        // this.COLUMN_WIDTH = GalleryGrid.calculatePixelValue(200);
+
+        this.IMAGE_HEIGHT = 200;
+        this.IMAGE_WIDTH = 200;
+        this.COLUMN_WIDTH = 200;
     }
 
     private resetChildState = () => {
@@ -79,14 +83,15 @@ export class GalleryGrid extends React.PureComponent<{galleryAPI: GalleryAPIInte
 
     calculateRowCount = (): number => {
         const rowCount = Math.floor(this.state.items.size / this.state.columnCount);
-        console.log("Row count calcuated as: "+rowCount);
-        console.log("Number of items: "+this.state.items.size+"columnCount: "+this.state.columnCount);
+        // console.log("Row count calcuated as: "+rowCount);
+        // console.log("Number of items: "+this.state.items.size+"columnCount: "+this.state.columnCount);
         return rowCount
     }
 
     stateAddPageItems = async (items: GalleryItem[]) => {
         let previousState = Object.assign({}, this.state);
         items.forEach((item) => {
+            // console.log(previousState.lastId);
             previousState.items.set(previousState.lastId,item);
             // @ts-ignore
             previousState.lastId++;
@@ -99,7 +104,15 @@ export class GalleryGrid extends React.PureComponent<{galleryAPI: GalleryAPIInte
     getNewPage = async () => {
         this.isDownloading = true;
         // get initial page of results to get us started
-        const items = await this.props.galleryAPI.getGalleryItems(this.state.pageNumber,this.props.sortOrder);
+        // const items = await this.props.galleryAPI.getGalleryItems(this.state.pageNumber,this.props.sortOrder);
+        const items: GalleryItem[] = [];
+        for (let i = 0; i < 10; i++) {
+            const item = await this.generateItem();
+            items.push(item);
+        }
+        await new Promise((resolve) => {
+            setTimeout(() => resolve(), 1000)
+        })
         await this.stateAddPageItems(items);
         this.isDownloading = false;
     }
@@ -118,18 +131,25 @@ export class GalleryGrid extends React.PureComponent<{galleryAPI: GalleryAPIInte
 
     cellRenderer = (cellProps: GridCellProps) => {
         const correctIndex = (cellProps.rowIndex * this.state.columnCount) +cellProps.columnIndex;
-        console.log("key: "+cellProps.key+" index: "+correctIndex);
+        // console.log("key: "+cellProps.key+" index: "+correctIndex);
         const items = this.state.items;
         // this is from the masonry example
         const item = items.get(correctIndex);
         if (typeof item !== "object") {
-            console.log("Items: ");
-            console.log(items);
-            throw new Error("Missing item")
+            // console.log("ItemsSearched: ");
+            // console.log(items);
+            throw new Error("Missing item "+correctIndex)
+        };
+        const paragraphStyle: React.CSSProperties = {
+            display: "inline" ,
+            width: this.IMAGE_WIDTH,
+            height: this.IMAGE_HEIGHT,
+            color: "white"
         };
         return (
-            <a key={cellProps.key} style={cellProps.style} href={item.itemURL}>
-                <img width={this.IMAGE_WIDTH} height={this.IMAGE_HEIGHT} src={item.thumbnailImageURL}/>
+            <a key={cellProps.key} style={{...cellProps.style, ...{ background: 'blue'}}} href={item.itemURL} >
+                {/*<img width={this.IMAGE_WIDTH} height={this.IMAGE_HEIGHT} src={item.thumbnailImageURL} style={{opacity: 0.5}}/>*/}
+                <p style={paragraphStyle}>Key: {cellProps.key} Top: {cellProps.style.top} Left: {cellProps.style.left} IHeight: {this.IMAGE_HEIGHT}</p>
             </a>
         );
     }
@@ -148,16 +168,7 @@ export class GalleryGrid extends React.PureComponent<{galleryAPI: GalleryAPIInte
     }
 
     generateItem = async (): Promise<GalleryItem> => {
-        let prevState = Object.assign({}, this.state);
-        console.log("Previous last id: ");
-        console.log(prevState.lastId);
-        // @ts-ignore since this is not actually read only but the react types are fucked
-        prevState.lastId = prevState.lastId + 1;
-        await this.setState(prevState);
-
-        console.log("Newlast id: ");
-        console.log(prevState.lastId);
-        return {id: prevState.lastId, thumbnailImageURL: "https://cdnb.artstation.com/p/assets/covers/images/017/685/915/micro_square/timo-peter-artstation-title-image.jpg?1556957002", itemURL:"https://www.artstation.com"}
+        return {id: 10, thumbnailImageURL: "https://cdnb.artstation.com/p/assets/covers/images/017/685/915/micro_square/timo-peter-artstation-title-image.jpg?1556957002", itemURL:"https://www.artstation.com"}
     }
 
     stateAddItem = async (item: GalleryItem) => {
@@ -196,10 +207,12 @@ export class GalleryGrid extends React.PureComponent<{galleryAPI: GalleryAPIInte
         // Render your grid
         return (
             <WindowScroller scrollElement={window}>
-                {({height, isScrolling, onChildScroll, scrollTop}) => (
-                    <div>
+                {({height, isScrolling, onChildScroll, scrollTop}) => {
+                    console.log("Scrolltop: ",scrollTop);
+                    return <div>
                         <AutoSizer id={"autosizer"} onResize={this.onResize} disableHeight>
                             {({width}) => (
+
                                     <Grid
                                         columnCount={this.state.columnCount}
                                         cellRenderer={this.cellRenderer}
@@ -215,7 +228,7 @@ export class GalleryGrid extends React.PureComponent<{galleryAPI: GalleryAPIInte
                             )}
                         </AutoSizer>
                     </div>
-                )}
+                }}
             </WindowScroller>
         );
     }

@@ -50,6 +50,10 @@ export class GalleryGrid extends React.PureComponent<{galleryAPI: GalleryAPIInte
         this.IMAGE_HEIGHT = 200;
         this.IMAGE_WIDTH = 200;
         this.COLUMN_WIDTH = 200;
+
+        window.addEventListener('scroll', function (event) {
+            console.log("NativeScrollY: ",window.scrollY);
+        });
     }
 
     private resetChildState = () => {

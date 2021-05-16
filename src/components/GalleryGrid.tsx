@@ -22,7 +22,7 @@ type GalleryState = {
     columnCount: number
 }
 
-export class GalleryGrid extends React.Component<{galleryAPI: GalleryAPIInterface,sortOrder: string},GalleryState> {
+export class GalleryGrid extends React.PureComponent<{galleryAPI: GalleryAPIInterface,sortOrder: string},GalleryState> {
     // locks downloading to one page only, so we don't download duplicated pages
     private isDownloading: boolean;
 
@@ -30,6 +30,7 @@ export class GalleryGrid extends React.Component<{galleryAPI: GalleryAPIInterfac
     private IMAGE_HEIGHT;
     private COLUMN_WIDTH;
     private GUTTER = 0;
+
 
     constructor(props) {
         super(props);
@@ -165,7 +166,14 @@ export class GalleryGrid extends React.Component<{galleryAPI: GalleryAPIInterfac
         await this.setState(previousState);
     }
 
-    onScroll = async (params: {clientHeight: number,scrollHeight: number, scrollTop: number}) => {
+    private isPageFilled(windowHeight: number,windowWidth: number): boolean {
+       const numImages = this.state.items.size;
+       const minNumberOfRows = Math.ceil(windowHeight / this.IMAGE_HEIGHT);
+       const minNumberOfImagesFill = this.state.columnCount * minNumberOfRows;
+       return numImages > minNumberOfImagesFill;
+    }
+
+    onScroll = async (params: {clientHeight: number, clientWidth: number ,scrollHeight: number, scrollTop: number}) => {
         // don't run if we are still waiting on a download
         if (this.isDownloading) return;
         // console.log("onScroll ran");
@@ -177,6 +185,10 @@ export class GalleryGrid extends React.Component<{galleryAPI: GalleryAPIInterfac
         if ((params.scrollTop + params.clientHeight) >= (params.scrollHeight - loadAheadOffset)) {
             console.log("Getting new page");
             await this.getNewPage();
+            // check to see if we need to make more page requests to fill the first page
+            while(!this.isPageFilled(params.clientHeight,params.clientWidth)) {
+                await this.getNewPage();
+            }
         }
     }
 

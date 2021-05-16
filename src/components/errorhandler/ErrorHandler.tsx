@@ -1,7 +1,7 @@
 import React from "react";
 import './ErrorHandlerStyle.css'
 
-export class ErrorHandler extends React.Component<any,{hasError:boolean,lastError:string,visible:boolean}> {
+export class ErrorHandler extends React.PureComponent<any,{hasError:boolean,lastError:string,visible:boolean}> {
     constructor(props) {
         super(props);
         this.state = { visible:false, hasError: false, lastError: '' };

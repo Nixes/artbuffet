@@ -2,7 +2,7 @@
   "name": "artbuffet",
   "version": "0.1.0",
   "private": true,
-  "homepage": "http://nixes.github.io/artbuffet",
+  "homepage": "http://nixes.github.io",
   "dependencies": {
     "@babel/runtime": "^7.10.5",
     "@types/jest": "24.0.12",

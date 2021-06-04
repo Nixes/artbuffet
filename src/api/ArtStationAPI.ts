@@ -9,7 +9,7 @@ export enum SORT {
 }
 
 export default class ArtStationAPI implements GalleryAPIInterface {
-    constructor(baseURL:string = 'https://cors-anywhere.herokuapp.com/https://www.artstation.com') {
+    constructor(baseURL:string = './') {
         this.baseURL = baseURL;
     }
     public readonly AVAILABLE_SORT_ORDERS = [

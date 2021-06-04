@@ -1,0 +1,10 @@
+version: '3'
+
+services:
+  api-proxy:
+    build:
+      context: ./
+      dockerfile: ./proxy/local/Dockerfile
+    container_name: artstation-api-proxy
+    ports:
+      - 8000:80

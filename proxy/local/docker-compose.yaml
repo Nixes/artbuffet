@@ -1,7 +1,0 @@
-version: '3'
-
-services:
-  api-proxy:
-    image: nginx:stable
-    ports:
-      - 8000:8000

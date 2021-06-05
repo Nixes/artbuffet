@@ -26,6 +26,8 @@ export class GalleryGrid extends React.PureComponent<{galleryAPI: GalleryAPIInte
     // locks downloading to one page only, so we don't download duplicated pages
     private isDownloading: boolean;
 
+    private static PRELOAD_PAGES = 4;
+
     private IMAGE_WIDTH;
     private IMAGE_HEIGHT;
     private COLUMN_WIDTH;
@@ -179,8 +181,7 @@ export class GalleryGrid extends React.PureComponent<{galleryAPI: GalleryAPIInte
         // console.log("onScroll ran");
         // console.log("clientHeight: "+params.clientHeight+" scrollHeight: "+params.scrollHeight
         //     +" scrollTop: "+params.scrollTop);
-        const preloadPages = 1;
-        const loadAheadOffset = params.clientHeight* preloadPages;
+        const loadAheadOffset = params.clientHeight * GalleryGrid.PRELOAD_PAGES;
 
         if ((params.scrollTop + params.clientHeight) >= (params.scrollHeight - loadAheadOffset)) {
             console.log("Getting new page");

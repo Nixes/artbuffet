@@ -198,7 +198,7 @@ export class GalleryGrid extends React.PureComponent<{galleryAPI: GalleryAPIInte
             <WindowScroller scrollElement={window}>
                 {({height, isScrolling, onChildScroll, scrollTop}) => (
                     <div>
-                        <AutoSizer id={"autosizer"} onResize={this.onResize} disableHeight>
+                        <AutoSizer id={"autosizer"} onResize={this.onResize}>
                             {({width}) => (
                                     <Grid
                                         columnCount={this.state.columnCount}

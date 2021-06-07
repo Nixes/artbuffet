@@ -22,7 +22,7 @@ type GalleryState = {
     columnCount: number
 }
 
-export class GalleryGrid extends React.PureComponent<{galleryAPI: GalleryAPIInterface,sortOrder: string},GalleryState> {
+export class GalleryGrid extends React.PureComponent<{galleryAPI: GalleryAPIInterface,sortOrder: string, pageNumber: number},GalleryState> {
     // locks downloading to one page only, so we don't download duplicated pages
     private isDownloading: boolean;
 
@@ -41,7 +41,7 @@ export class GalleryGrid extends React.PureComponent<{galleryAPI: GalleryAPIInte
         this.state = {
             items: new Map<number,GalleryItem>(),
             lastId:0,
-            pageNumber: 1,
+            pageNumber: this.props.pageNumber,
             columnCount: 4
         };
 

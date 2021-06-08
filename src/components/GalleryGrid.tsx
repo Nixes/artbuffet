@@ -13,6 +13,7 @@ import {
 import GalleryItem from "../models/GalleryItem";
 import ArtStationAPI, {SORT} from "../api/ArtStationAPI";
 import {GalleryAPIInterface} from "../api/GalleryAPIInterface";
+import * as H from "history";
 
 
 type GalleryState = {
@@ -22,7 +23,7 @@ type GalleryState = {
     columnCount: number
 }
 
-export class GalleryGrid extends React.PureComponent<{galleryAPI: GalleryAPIInterface,sortOrder: string, pageNumber: number},GalleryState> {
+export class GalleryGrid extends React.PureComponent<{galleryAPI: GalleryAPIInterface,sortOrder: string, pageNumber: number,history: H.History},GalleryState> {
     // locks downloading to one page only, so we don't download duplicated pages
     private isDownloading: boolean;
 
@@ -95,6 +96,7 @@ export class GalleryGrid extends React.PureComponent<{galleryAPI: GalleryAPIInte
         });
         // @ts-ignore ignored due to broken react types
         previousState.pageNumber++;
+        this.props.history.push(`/page/${previousState.pageNumber}`);
         await this.setState(previousState);
     }
 

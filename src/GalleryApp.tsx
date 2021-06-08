@@ -35,11 +35,11 @@ class GalleryApp extends React.PureComponent<any, {sortOrder:string}> {
         return <div className="App">
             <OptionsMenu changeSortOrder={this.changeSortOrder} defaultSortOrder={this.state.sortOrder} sortingOptions={this.galleryAPI.AVAILABLE_SORT_ORDERS}></OptionsMenu>
             <ErrorHandler></ErrorHandler>
-            <GalleryGrid galleryAPI={this.galleryAPI} sortOrder={this.state.sortOrder} pageNumber={1}></GalleryGrid>
             <Router>
                 <div>
-                    <Route exact path="/" component={ (props) =>  <GalleryGrid galleryAPI={this.galleryAPI} sortOrder={this.state.sortOrder} pageNumber={1}/>} />
-                    <Route exact path="/page/:pageNumber" component={(props) => <GalleryGrid galleryAPI={this.galleryAPI} sortOrder={this.state.sortOrder} pageNumber={parseInt(props.match.params.pageNumber)}></GalleryGrid>} />
+                    <Route exact path={["/page/:pageNumber","/"]} component={(props) =>
+                        <GalleryGrid galleryAPI={this.galleryAPI} sortOrder={this.state.sortOrder} pageNumber={props.match.params.pageNumber !== undefined ? parseInt(props.match.params.pageNumber) : 1} history={props.history}/>
+                    } />
                 </div>
             </Router>
         </div>

@@ -87,17 +87,20 @@ export class GalleryGrid extends React.PureComponent<{galleryAPI: GalleryAPIInte
         return rowCount
     }
 
-    stateAddPageItems = async (items: GalleryItem[]) => {
-        let previousState = Object.assign({}, this.state);
-        items.forEach((item) => {
-            previousState.items.set(previousState.lastId,item);
-            // @ts-ignore
-            previousState.lastId++;
+    stateAddPageItems = async (newItems: GalleryItem[]) => {
+        let lastId = this.state.lastId;
+        let items = this.state.items;
+        newItems.forEach((item) => {
+            items.set(lastId,item);
+            lastId++;
         });
-        // @ts-ignore ignored due to broken react types
-        previousState.pageNumber++;
-        this.props.history.push(`/page/${previousState.pageNumber}`);
-        await this.setState(previousState);
+
+        await this.setState({
+            pageNumber: this.state.pageNumber+1,
+            lastId:lastId,
+            items:items
+        });
+        this.props.history.push(`/page/${this.state.pageNumber}`);
     }
 
     getNewPage = async () => {
@@ -109,10 +112,7 @@ export class GalleryGrid extends React.PureComponent<{galleryAPI: GalleryAPIInte
     }
 
     private setColumnCount(columnCount:number) {
-        let prevState = Object.assign([],this.state);
-        // @ts-ignore
-        prevState.columnCount = columnCount;
-        this.setState(prevState);
+        this.setState({columnCount: columnCount});
     }
 
     onResize = ({width}: any) => {
@@ -152,22 +152,14 @@ export class GalleryGrid extends React.PureComponent<{galleryAPI: GalleryAPIInte
     }
 
     generateItem = async (): Promise<GalleryItem> => {
-        let prevState = Object.assign({}, this.state);
-        console.log("Previous last id: ");
-        console.log(prevState.lastId);
-        // @ts-ignore since this is not actually read only but the react types are fucked
-        prevState.lastId = prevState.lastId + 1;
-        await this.setState(prevState);
-
-        console.log("Newlast id: ");
-        console.log(prevState.lastId);
-        return {id: prevState.lastId, thumbnailImageURL: "https://cdnb.artstation.com/p/assets/covers/images/017/685/915/micro_square/timo-peter-artstation-title-image.jpg?1556957002", itemURL:"https://www.artstation.com"}
+        await this.setState({lastId:this.state.lastId+1});
+        return {id: this.state.lastId, thumbnailImageURL: "https://cdnb.artstation.com/p/assets/covers/images/017/685/915/micro_square/timo-peter-artstation-title-image.jpg?1556957002", itemURL:"https://www.artstation.com"}
     }
 
     stateAddItem = async (item: GalleryItem) => {
-        let previousState = Object.assign({}, this.state);
-        previousState.items.set(item.id,item);
-        await this.setState(previousState);
+        let items = this.state.items;
+        items.set(item.id,item);
+        await this.setState({items:items});
     }
 
     private isPageFilled(windowHeight: number,windowWidth: number): boolean {

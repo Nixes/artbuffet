@@ -14,13 +14,15 @@ import GalleryItem from "../models/GalleryItem";
 import ArtStationAPI, {SORT} from "../api/ArtStationAPI";
 import {GalleryAPIInterface} from "../api/GalleryAPIInterface";
 import * as H from "history";
+import {SectionRenderedParams} from "react-virtualized/dist/es/Grid";
 
 
 type GalleryState = {
     items: Map<number,GalleryItem>,
     lastId: number,
     pageNumber: number,
-    columnCount: number
+    columnCount: number,
+    visiblePageNumber: number
 }
 
 export class GalleryGrid extends React.PureComponent<{galleryAPI: GalleryAPIInterface,sortOrder: string, pageNumber: number,history: H.History},GalleryState> {
@@ -43,6 +45,7 @@ export class GalleryGrid extends React.PureComponent<{galleryAPI: GalleryAPIInte
             items: new Map<number,GalleryItem>(),
             lastId:0,
             pageNumber: this.props.pageNumber,
+            visiblePageNumber: this.props.pageNumber,
             columnCount: 4
         };
 
@@ -94,10 +97,12 @@ export class GalleryGrid extends React.PureComponent<{galleryAPI: GalleryAPIInte
             // @ts-ignore
             previousState.lastId++;
         });
-        // @ts-ignore ignored due to broken react types
-        previousState.pageNumber++;
-        this.props.history.push(`/page/${previousState.pageNumber}`);
         await this.setState(previousState);
+    }
+
+    private setVisiblePageNumber = async (visiblePageNumber: number) => {
+        this.props.history.push(`/page/${visiblePageNumber}`);
+        await this.setState({visiblePageNumber:visiblePageNumber});
     }
 
     getNewPage = async () => {
@@ -105,6 +110,7 @@ export class GalleryGrid extends React.PureComponent<{galleryAPI: GalleryAPIInte
         // get initial page of results to get us started
         const items = await this.props.galleryAPI.getGalleryItems(this.state.pageNumber,this.props.sortOrder);
         await this.stateAddPageItems(items);
+        await this.setState({pageNumber:this.state.pageNumber+1})
         this.isDownloading = false;
     }
 
@@ -120,17 +126,21 @@ export class GalleryGrid extends React.PureComponent<{galleryAPI: GalleryAPIInte
         // this.resetCellPositioner();
     }
 
-    cellRenderer = (cellProps: GridCellProps) => {
-        const correctIndex = (cellProps.rowIndex * this.state.columnCount) +cellProps.columnIndex;
-        console.log("key: "+cellProps.key+" index: "+correctIndex);
-        const items = this.state.items;
-        // this is from the masonry example
-        const item = items.get(correctIndex);
+    private getItemForGridPos = (rowIndex:number, columnIndex:number): GalleryItem => {
+        const correctIndex = (rowIndex * this.state.columnCount) +columnIndex;
+        // console.log("key: "+cellProps.key+" index: "+correctIndex);
+        const item = this.state.items.get(correctIndex);
         if (typeof item !== "object") {
             console.log("Items: ");
-            console.log(items);
+            console.log(this.state.items);
             throw new Error("Missing item")
         };
+        return item;
+    }
+
+    cellRenderer = (cellProps: GridCellProps) => {
+        const item = this.getItemForGridPos(cellProps.rowIndex,cellProps.columnIndex);
+
         return (
             <a key={cellProps.key} style={cellProps.style} href={item.itemURL}>
                 <img width={this.IMAGE_WIDTH} height={this.IMAGE_HEIGHT} src={item.thumbnailImageURL}/>
@@ -161,7 +171,7 @@ export class GalleryGrid extends React.PureComponent<{galleryAPI: GalleryAPIInte
 
         console.log("Newlast id: ");
         console.log(prevState.lastId);
-        return {id: prevState.lastId, thumbnailImageURL: "https://cdnb.artstation.com/p/assets/covers/images/017/685/915/micro_square/timo-peter-artstation-title-image.jpg?1556957002", itemURL:"https://www.artstation.com"}
+        return {id: prevState.lastId, thumbnailImageURL: "https://cdnb.artstation.com/p/assets/covers/images/017/685/915/micro_square/timo-peter-artstation-title-image.jpg?1556957002", itemURL:"https://www.artstation.com", pageNumber:this.state.pageNumber}
     }
 
     stateAddItem = async (item: GalleryItem) => {
@@ -195,6 +205,15 @@ export class GalleryGrid extends React.PureComponent<{galleryAPI: GalleryAPIInte
         }
     }
 
+    /**
+     * updates when visible region of windowed content being rendered changes
+     * @param renderedParams
+     */
+    onSectionRendered = async (renderedParams:SectionRenderedParams) => {
+        let topLeftItem = this.getItemForGridPos(renderedParams.rowStartIndex,renderedParams.columnStartIndex);
+        await this.setVisiblePageNumber(topLeftItem.pageNumber);
+    }
+
     public render = () => {
         // Render your grid
         return (
@@ -204,6 +223,7 @@ export class GalleryGrid extends React.PureComponent<{galleryAPI: GalleryAPIInte
                         <AutoSizer id={"autosizer"} onResize={this.onResize}>
                             {({width}) => (
                                     <Grid
+                                        onSectionRendered={this.onSectionRendered}
                                         columnCount={this.state.columnCount}
                                         cellRenderer={this.cellRenderer}
                                         height={height}

@@ -1,10 +1,10 @@
 # ArtBuffet
-is a third party ArtStation gallery UI with mucb better performance compared to the official website.
+Is a third party ArtStation gallery UI, intended to create a much more performant and smooth infinite scroll experience, with a similar high density layout.
 
 You can see latest version in action at: https://artbuffet.nixes.cc
 
 # Project Goal
-To have a much more performant and smooth infinite scroll experience, but with a similar high density layout
+To have a much more performant and smooth infinite scroll experience, with a similar high density layout.
 
 # Road Map
 - [x] Store current scroll progress so a user can come back to a page and resume from mostly the same place

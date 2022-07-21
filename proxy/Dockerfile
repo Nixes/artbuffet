@@ -1,4 +1,4 @@
-FROM node as build-stage
+FROM node:16 as build-stage
 WORKDIR /app
 COPY ./package.json ./package-lock.json /app/
 RUN npm install

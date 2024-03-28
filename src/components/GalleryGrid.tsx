@@ -150,14 +150,7 @@ export class GalleryGrid extends React.PureComponent<{galleryAPI: GalleryAPIInte
      * returns number of columns, must be 1 or greater
      * @param width
      */
-    calculateColumnCount = (width: number): number =>  {
-        const calculatedColumnCount =  Math.floor((width + this.GUTTER) / (this.COLUMN_WIDTH + this.GUTTER));
-        if (calculatedColumnCount > 0) {
-            return calculatedColumnCount
-        } else {
-            return 1;
-        }
-    }
+    calculateColumnCount = (width: number): number => Math.max(Math.floor((width + this.GUTTER) / (this.COLUMN_WIDTH + this.GUTTER)), 1);
 
     // test method to prevent hitting upstream server too much
     // generateItem = async (): Promise<GalleryItem> => {

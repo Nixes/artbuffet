@@ -1,17 +1,11 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
 import {
-    CellMeasurer,
-    CellMeasurerCache,
-    createMasonryCellPositioner,
     Grid,
     AutoSizer,
     WindowScroller,
-    Positioner,
     GridCellProps
 } from 'react-virtualized';
 import GalleryItem from "../models/GalleryItem";
-import ArtStationAPI, {SORT} from "../api/ArtStationAPI";
 import {GalleryAPIInterface} from "../api/GalleryAPIInterface";
 import * as H from "history";
 import {SectionRenderedParams} from "react-virtualized/dist/es/Grid";
@@ -85,8 +79,8 @@ export class GalleryGrid extends React.PureComponent<{galleryAPI: GalleryAPIInte
 
     calculateRowCount = (): number => {
         const rowCount = Math.floor(this.state.items.size / this.state.columnCount);
-        console.log("Row count calcuated as: "+rowCount);
-        console.log("Number of items: "+this.state.items.size+"columnCount: "+this.state.columnCount);
+        console.info("Row count calcuated as: "+rowCount);
+        console.info("Number of items: "+this.state.items.size+"columnCount: "+this.state.columnCount);
         return rowCount
     }
 

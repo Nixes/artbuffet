@@ -97,12 +97,12 @@ export class GalleryGrid extends React.PureComponent<{galleryAPI: GalleryAPIInte
             // @ts-ignore
             previousState.lastId++;
         });
-        await this.setState(previousState);
+        this.setState(previousState);
     }
 
     private setVisiblePageNumber = async (visiblePageNumber: number) => {
         this.props.history.push(`/page/${visiblePageNumber}`);
-        await this.setState({visiblePageNumber:visiblePageNumber});
+        this.setState({ visiblePageNumber: visiblePageNumber });
     }
 
     getNewPage = async () => {
@@ -110,7 +110,7 @@ export class GalleryGrid extends React.PureComponent<{galleryAPI: GalleryAPIInte
         // get initial page of results to get us started
         const items = await this.props.galleryAPI.getGalleryItems(this.state.pageNumber,this.props.sortOrder);
         await this.stateAddPageItems(items);
-        await this.setState({pageNumber:this.state.pageNumber+1})
+        this.setState({ pageNumber: this.state.pageNumber + 1 })
         this.isDownloading = false;
     }
 
@@ -167,7 +167,7 @@ export class GalleryGrid extends React.PureComponent<{galleryAPI: GalleryAPIInte
         console.log(prevState.lastId);
         // @ts-ignore since this is not actually read only but the react types are fucked
         prevState.lastId = prevState.lastId + 1;
-        await this.setState(prevState);
+        this.setState(prevState);
 
         console.log("Newlast id: ");
         console.log(prevState.lastId);
@@ -177,7 +177,7 @@ export class GalleryGrid extends React.PureComponent<{galleryAPI: GalleryAPIInte
     stateAddItem = async (item: GalleryItem) => {
         let previousState = Object.assign({}, this.state);
         previousState.items.set(item.id,item);
-        await this.setState(previousState);
+        this.setState(previousState);
     }
 
     private isPageFilled(windowHeight: number,windowWidth: number): boolean {

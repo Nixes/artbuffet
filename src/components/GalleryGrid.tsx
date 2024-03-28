@@ -115,20 +115,18 @@ export class GalleryGrid extends React.PureComponent<{galleryAPI: GalleryAPIInte
     }
 
     private setColumnCount(columnCount:number) {
-        let prevState = Object.assign([],this.state);
-        // @ts-ignore
-        prevState.columnCount = columnCount;
-        this.setState(prevState);
+        this.setState(prevState => ({
+            ...prevState,
+            columnCount: columnCount
+        }));
     }
 
     onResize = ({width}: any) => {
         this.setColumnCount(this.calculateColumnCount(width));
-        // this.resetCellPositioner();
     }
 
     private getItemForGridPos = (rowIndex:number, columnIndex:number): GalleryItem => {
         const correctIndex = (rowIndex * this.state.columnCount) +columnIndex;
-        // console.log("key: "+cellProps.key+" index: "+correctIndex);
         const item = this.state.items.get(correctIndex);
         if (typeof item !== "object") {
             console.log("Items: ");
@@ -161,18 +159,20 @@ export class GalleryGrid extends React.PureComponent<{galleryAPI: GalleryAPIInte
         }
     }
 
-    generateItem = async (): Promise<GalleryItem> => {
-        let prevState = Object.assign({}, this.state);
-        console.log("Previous last id: ");
-        console.log(prevState.lastId);
-        // @ts-ignore since this is not actually read only but the react types are fucked
-        prevState.lastId = prevState.lastId + 1;
-        this.setState(prevState);
+    // test method to prevent hitting upstream server too much
+    // generateItem = async (): Promise<GalleryItem> => {
+    //     console.info("Previous last id: ");
+    //     console.info(this.state.lastId);
+    //     this.setState(prevState => ({
+    //         ...prevState,
+    //         lastId: prevState.lastId + 1
+    //     }));
 
-        console.log("Newlast id: ");
-        console.log(prevState.lastId);
-        return {id: prevState.lastId, thumbnailImageURL: "https://cdnb.artstation.com/p/assets/covers/images/017/685/915/micro_square/timo-peter-artstation-title-image.jpg?1556957002", itemURL:"https://www.artstation.com", pageNumber:this.state.pageNumber}
-    }
+    //     const { lastId } = this.state;
+    //     console.info("New last id: ");
+    //     console.info(lastId);
+    //     return { id: lastId, thumbnailImageURL: "https://cdnb.artstation.com/p/assets/covers/images/017/685/915/micro_square/timo-peter-artstation-title-image.jpg?1556957002", itemURL: "https://www.artstation.com", pageNumber: this.state.pageNumber }
+    // }
 
     stateAddItem = async (item: GalleryItem) => {
         let previousState = Object.assign({}, this.state);
@@ -190,13 +190,9 @@ export class GalleryGrid extends React.PureComponent<{galleryAPI: GalleryAPIInte
     onScroll = async (params: {clientHeight: number, clientWidth: number ,scrollHeight: number, scrollTop: number}) => {
         // don't run if we are still waiting on a download
         if (this.isDownloading) return;
-        // console.log("onScroll ran");
-        // console.log("clientHeight: "+params.clientHeight+" scrollHeight: "+params.scrollHeight
-        //     +" scrollTop: "+params.scrollTop);
         const loadAheadOffset = params.clientHeight * GalleryGrid.PRELOAD_PAGES;
 
         if ((params.scrollTop + params.clientHeight) >= (params.scrollHeight - loadAheadOffset)) {
-            console.log("Getting new page");
             await this.getNewPage();
             // check to see if we need to make more page requests to fill the first page
             while(!this.isPageFilled(params.clientHeight,params.clientWidth)) {

@@ -5,7 +5,7 @@ import {OptionsMenu} from "./components/OptionsMenu";
 import {ErrorHandler} from "./components/errorhandler/ErrorHandler";
 import ArtStationAPI, {SORT} from "./api/ArtStationAPI";
 import {GalleryAPIInterface} from "./api/GalleryAPIInterface";
-import { Route, BrowserRouter as Router, Link, match } from 'react-router-dom';
+import { Route, BrowserRouter as Router} from 'react-router-dom';
 
 
 

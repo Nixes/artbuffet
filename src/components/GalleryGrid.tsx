@@ -124,7 +124,7 @@ export class GalleryGrid extends React.PureComponent<{galleryAPI: GalleryAPIInte
     private getItemForGridPos = (rowIndex:number, columnIndex:number): GalleryItem => {
         const correctIndex = (rowIndex * this.state.columnCount) +columnIndex;
         const item = this.state.items.get(correctIndex);
-        if (typeof item !== "object") {
+        if (typeof item !== "object" || item === null) {
             console.log("Items: ");
             console.log(this.state.items);
             throw new Error("Missing item")

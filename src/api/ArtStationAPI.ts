@@ -18,7 +18,7 @@ export default class ArtStationAPI implements GalleryAPIInterface {
         SORT.PICKS,
         SORT.POPULARITY,
     ];
-    private baseURL: string;
+    private readonly baseURL: string;
 
     public isValidSortOrder(sortOrder:string): boolean {
         const found = this.AVAILABLE_SORT_ORDERS.find(function (value) {
@@ -48,19 +48,18 @@ export default class ArtStationAPI implements GalleryAPIInterface {
         const response = await fetch(url,options);
         const json = await response.json();
         const artstationItems: [] = json.data;
-        const convertedItems: GalleryItem[] = artstationItems.flatMap((artstationItem:any)=>{
+        return artstationItems.flatMap((artstationItem: any) => {
             // check that there was cover art, some entries with no uploaded assets don't have any
             if (artstationItem.cover !== undefined && artstationItem.cover.micro_square_image_url !== undefined) {
                 return [{
-                    id:artstationItem.id,
-                    itemURL:artstationItem.permalink,
-                    thumbnailImageURL:artstationItem.cover.micro_square_image_url,
+                    id: artstationItem.id,
+                    itemURL: artstationItem.permalink,
+                    thumbnailImageURL: artstationItem.cover.micro_square_image_url,
                     pageNumber: page
                 }]
             }
 
             return [];
         });
-        return convertedItems;
     }
 }

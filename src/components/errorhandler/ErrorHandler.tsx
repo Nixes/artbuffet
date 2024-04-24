@@ -20,16 +20,13 @@ export class ErrorHandler extends React.PureComponent<any,{hasError:boolean,last
 
     logError(error: string) {
         this.setState({visible: true, hasError: true, lastError:error });
-        console.log("React caught an error: ");
-        console.log(error);
+        console.error("React caught an error: ");
+        console.error(error);
         return true;
     }
 
     hide = () => {
-        let oldstate = Object.assign({},this.state);
-        // @ts-ignore
-        oldstate.visible = false;
-        this.setState(oldstate);
+        this.setState({ visible: false });
     }
 
     render() {

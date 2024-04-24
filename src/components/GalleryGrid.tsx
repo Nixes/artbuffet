@@ -96,7 +96,7 @@ export class GalleryGrid extends React.PureComponent<{galleryAPI: GalleryAPIInte
         });
     }
 
-    private setVisiblePageNumber = async (visiblePageNumber: number) => {
+    private setVisiblePageNumber = (visiblePageNumber: number) => {
         this.props.history.push(`/page/${visiblePageNumber}`);
         this.setState({ visiblePageNumber: visiblePageNumber });
     }
@@ -181,7 +181,7 @@ export class GalleryGrid extends React.PureComponent<{galleryAPI: GalleryAPIInte
      */
     onSectionRendered = async (renderedParams:SectionRenderedParams) => {
         let topLeftItem = this.getItemForGridPos(renderedParams.rowStartIndex,renderedParams.columnStartIndex);
-        await this.setVisiblePageNumber(topLeftItem.pageNumber);
+        this.setVisiblePageNumber(topLeftItem.pageNumber);
     }
 
     public render = () => {

@@ -85,13 +85,15 @@ export class GalleryGrid extends React.PureComponent<{galleryAPI: GalleryAPIInte
     }
 
     stateAddPageItems = async (items: GalleryItem[]) => {
-        let previousState = Object.assign({}, this.state);
-        items.forEach((item) => {
-            previousState.items.set(previousState.lastId,item);
-            // @ts-ignore
-            previousState.lastId++;
+        this.setState(prevState => {
+            const newItems = new Map(prevState.items);
+            let newLastId = prevState.lastId;
+            items.forEach((item) => {
+                newItems.set(newLastId, item);
+                newLastId++;
+            });
+            return { items: newItems, lastId: newLastId };
         });
-        this.setState(previousState);
     }
 
     private setVisiblePageNumber = async (visiblePageNumber: number) => {
@@ -145,21 +147,6 @@ export class GalleryGrid extends React.PureComponent<{galleryAPI: GalleryAPIInte
      * @param width
      */
     calculateColumnCount = (width: number): number => Math.max(Math.floor((width + this.GUTTER) / (this.COLUMN_WIDTH + this.GUTTER)), 1);
-
-    // test method to prevent hitting upstream server too much
-    // generateItem = async (): Promise<GalleryItem> => {
-    //     console.info("Previous last id: ");
-    //     console.info(this.state.lastId);
-    //     this.setState(prevState => ({
-    //         ...prevState,
-    //         lastId: prevState.lastId + 1
-    //     }));
-
-    //     const { lastId } = this.state;
-    //     console.info("New last id: ");
-    //     console.info(lastId);
-    //     return { id: lastId, thumbnailImageURL: "https://cdnb.artstation.com/p/assets/covers/images/017/685/915/micro_square/timo-peter-artstation-title-image.jpg?1556957002", itemURL: "https://www.artstation.com", pageNumber: this.state.pageNumber }
-    // }
 
     stateAddItem = async (item: GalleryItem) => {
         let previousState = Object.assign({}, this.state);

@@ -137,7 +137,7 @@ export class GalleryGrid extends React.PureComponent<{galleryAPI: GalleryAPIInte
 
         return (
             <a key={cellProps.key} style={cellProps.style} href={item.itemURL}>
-                <img width={this.IMAGE_WIDTH} height={this.IMAGE_HEIGHT} src={item.thumbnailImageURL}/>
+                <img width={this.IMAGE_WIDTH} height={this.IMAGE_HEIGHT} src={item.thumbnailImageURL} alt=""/>
             </a>
         );
     }
